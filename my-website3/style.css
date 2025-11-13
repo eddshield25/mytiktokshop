@@ -85,29 +85,446 @@ body {
     align-items: center;
 }
 
-.btn-search, .btn-cart {
-    background: none;
+/* Navigation Admin Button */
+.btn-admin {
+    background: linear-gradient(135deg, #00f2ea, #0099ff);
+    color: white;
     border: none;
-    font-size: 1.2rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 25px;
     cursor: pointer;
-    color: var(--text-color);
+    font-weight: 600;
     transition: var(--transition);
-    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
 }
 
-.btn-cart .cart-count {
-    position: absolute;
-    top: -8px;
-    right: -8px;
+.btn-admin:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 242, 234, 0.3);
+}
+
+/* Products Grid - 4 per row */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.pagination-btn {
     background: var(--primary-color);
     color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pagination-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: #e00045;
+    transform: translateY(-2px);
+}
+
+.page-info {
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+/* Admin Panel Improvements */
+.admin-panel {
+    position: fixed;
+    top: 0;
+    right: -450px;
+    width: 450px;
+    height: 100vh;
+    background: white;
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+    z-index: 1001;
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-panel.active {
+    right: 0;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    margin-bottom: 0;
+}
+
+.admin-header h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.3rem;
+}
+
+.close-admin {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
     border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    font-size: 0.7rem;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: var(--transition);
+}
+
+.close-admin:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.admin-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+}
+
+.admin-form {
+    padding: 1.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: var(--transition);
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(255, 0, 80, 0.1);
+}
+
+.form-group textarea {
+    height: 80px;
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 0, 80, 0.3);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+/* Product List in Admin */
+.product-list-section {
+    padding: 1.5rem;
+}
+
+.product-list-section h4 {
+    margin-bottom: 1rem;
+    color: var(--dark-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.product-list {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 2px solid #f0f0f0;
+    border-radius: 8px;
+    padding: 0.5rem;
+    background: #fafafa;
+}
+
+.product-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    transition: var(--transition);
+    background: white;
+    margin-bottom: 0.5rem;
+    border-radius: 6px;
+}
+
+.product-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.product-item:hover {
+    background: #f8f9fa;
+    transform: translateX(5px);
+}
+
+.product-info {
+    flex: 1;
+}
+
+.product-info strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--dark-color);
+    font-size: 0.95rem;
+}
+
+.product-info small {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.delete-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.delete-btn:hover {
+    background: #c82333;
+    transform: scale(1.05);
+}
+
+/* Admin Actions */
+.admin-actions {
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-top: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.action-btn {
+    padding: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.export-btn {
+    background: #28a745;
+    color: white;
+}
+
+.export-btn:hover {
+    background: #218838;
+    transform: translateY(-2px);
+}
+
+.import-btn {
+    background: #17a2b8;
+    color: white;
+}
+
+.import-btn:hover {
+    background: #138496;
+    transform: translateY(-2px);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+.empty-state i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #ccc;
+}
+
+/* Overlay */
+.admin-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.admin-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Success Message */
+.success-message {
+    background: #d4edda;
+    color: #155724;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: 1px solid #c3e6cb;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Quick Actions */
+.quick-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.quick-btn {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.8rem;
+}
+
+.quick-btn:hover {
+    background: #f8f9fa;
+    border-color: var(--primary-color);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .products-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .nav-actions {
+        gap: 0.5rem;
+    }
+    
+    .btn-admin span {
+        display: none;
+    }
+    
+    .btn-admin {
+        padding: 0.6rem;
+    }
+    
+    .admin-panel {
+        width: 100%;
+        right: -100%;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .pagination {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
 }
 
 /* Hero Section */
