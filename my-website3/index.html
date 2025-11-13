@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTrend Shop | TikTok Viral Products</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-brand">
+                <i class="fab fa-tiktok"></i>
+                <span>TikTrend Shop</span>
+            </div>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#products">Products</a>
+                <a href="#trending">Trending</a>
+                <a href="#about">About</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-search"><i class="fas fa-search"></i></button>
+                <button class="btn-cart"><i class="fas fa-shopping-cart"></i><span class="cart-count">0</span></button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Viral TikTok Products</h1>
+            <p>Discover the most popular and trending products from TikTok creators. Shop what's hot right now!</p>
+            <button class="btn-primary">Shop Trending Now</button>
+        </div>
+        <div class="hero-visual">
+            <div class="floating-product">
+                <i class="fab fa-tiktok"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- Disclosure Banner -->
+    <div class="disclosure-banner">
+        <p><i class="fas fa-exclamation-circle"></i> <strong>Disclosure:</strong> We earn commissions from purchases made through our TikTok affiliate links. This helps support our content at no extra cost to you!</p>
+    </div>
+
+    <!-- Products Section -->
+    <section class="products-section" id="products">
+        <div class="container">
+            <h2>Trending Right Now 🔥</h2>
+            <p class="section-subtitle">These products are going viral on TikTok</p>
+            
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+                <button class="filter-btn active" data-filter="all">All Products</button>
+                <button class="filter-btn" data-filter="beauty">Beauty</button>
+                <button class="filter-btn" data-filter="home">Home & Living</button>
+                <button class="filter-btn" data-filter="tech">Tech Gadgets</button>
+                <button class="filter-btn" data-filter="fashion">Fashion</button>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="products-grid" id="productsGrid">
+                <!-- Products will be loaded dynamically by JavaScript -->
+            </div>
+
+            <!-- Load More Button -->
+            <div class="load-more-container">
+                <button class="btn-secondary" id="loadMore">Load More Products</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-bolt"></i>
+                    <h3>Viral Products</h3>
+                    <p>Curated selection of trending TikTok products</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Trusted Sellers</h3>
+                    <p>All products from verified TikTok Shop sellers</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-shipping-fast"></i>
+                    <h3>Fast Shipping</h3>
+                    <p>Quick delivery on all trending items</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-tag"></i>
+                    <h3>Best Prices</h3>
+                    <p>Competitive pricing with affiliate benefits</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>TikTrend Shop</h3>
+                    <p>Your gateway to the most viral TikTok products. Shop smart, shop trending!</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#products">Products</a></li>
+                        <li><a href="#trending">Trending</a></li>
+                        <li><a href="#about">About Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Shipping Info</a></li>
+                        <li><a href="#">Returns</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Newsletter</h4>
+                    <p>Get updates on the latest viral products</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Your email address" required>
+                        <button type="submit">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 TikTrend Shop. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+                <p class="affiliate-disclosure">As TikTok affiliates, we earn from qualifying purchases.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
