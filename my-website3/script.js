@@ -1,5 +1,30 @@
 // Dynamic Product Management System
-let affiliateProducts = JSON.parse(localStorage.getItem('tiktrendProducts')) || [];
+let affiliateProducts = JSON.parse(localStorage.getItem('tiktrendProducts')) || [
+    // Sample products
+    {
+        affiliateLink: "https://www.tiktok.com/affiliate/sample1",
+        title: "Viral Hair Growth Serum",
+        description: "The hair serum that's taking TikTok by storm! Users report incredible growth results in weeks.",
+        price: "$24.99",
+        originalPrice: "$39.99",
+        category: "beauty",
+        badge: "Viral"
+    },
+    {
+        affiliateLink: "https://www.tiktok.com/affiliate/sample2",
+        title: "Smart Posture Corrector",
+        description: "Wearable device that vibrates when you slouch. Perfect for desk workers and students.",
+        price: "$29.99",
+        originalPrice: "$49.99",
+        category: "tech",
+        badge: "Trending"
+    }
+];
+
+// Display Configuration
+const PRODUCTS_PER_PAGE = 20; // 4 products per row × 5 rows
+let currentPage = 1;
+let currentFilter = 'all';
 
 // DOM Elements
 const productsGrid = document.getElementById('productsGrid');
@@ -10,24 +35,32 @@ const adminToggle = document.getElementById('adminToggle');
 const productForm = document.getElementById('productForm');
 const productList = document.getElementById('productList');
 const productCount = document.getElementById('productCount');
-let currentFilter = 'all';
-let displayedProducts = 8;
+const paginationContainer = document.createElement('div');
 
 // Initialize the website
 document.addEventListener('DOMContentLoaded', function() {
+    initializePagination();
     displayProducts();
     setupEventListeners();
     updateProductList();
     console.log('TikTrend Shop loaded with', affiliateProducts.length, 'products');
 });
 
-// Display products based on filter
+// Initialize Pagination
+function initializePagination() {
+    paginationContainer.className = 'pagination';
+    productsGrid.parentNode.insertBefore(paginationContainer, productsGrid.nextSibling);
+}
+
+// Display products with pagination
 function displayProducts() {
     const filteredProducts = currentFilter === 'all' 
         ? affiliateProducts 
         : affiliateProducts.filter(product => product.category === currentFilter);
     
-    const productsToShow = filteredProducts.slice(0, displayedProducts);
+    const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
+    const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
+    const productsToShow = filteredProducts.slice(startIndex, startIndex + PRODUCTS_PER_PAGE);
     
     productsGrid.innerHTML = '';
     
@@ -42,7 +75,7 @@ function displayProducts() {
                 </button>
             </div>
         `;
-        loadMoreBtn.style.display = 'none';
+        paginationContainer.style.display = 'none';
         return;
     }
     
@@ -51,7 +84,49 @@ function displayProducts() {
         productsGrid.appendChild(productCard);
     });
     
-    loadMoreBtn.style.display = displayedProducts >= filteredProducts.length ? 'none' : 'block';
+    updatePagination(filteredProducts.length, totalPages);
+}
+
+// Update pagination controls
+function updatePagination(totalProducts, totalPages) {
+    paginationContainer.innerHTML = '';
+    
+    if (totalPages <= 1) {
+        paginationContainer.style.display = 'none';
+        return;
+    }
+    
+    paginationContainer.style.display = 'flex';
+    
+    const prevButton = document.createElement('button');
+    prevButton.className = 'pagination-btn';
+    prevButton.innerHTML = '<i class="fas fa-chevron-left"></i> Previous';
+    prevButton.disabled = currentPage === 1;
+    prevButton.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            displayProducts();
+        }
+    });
+    
+    const nextButton = document.createElement('button');
+    nextButton.className = 'pagination-btn';
+    nextButton.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
+    nextButton.disabled = currentPage === totalPages;
+    nextButton.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            displayProducts();
+        }
+    });
+    
+    const pageInfo = document.createElement('span');
+    pageInfo.className = 'page-info';
+    pageInfo.textContent = `Page ${currentPage} of ${totalPages} (${totalProducts} products)`;
+    
+    paginationContainer.appendChild(prevButton);
+    paginationContainer.appendChild(pageInfo);
+    paginationContainer.appendChild(nextButton);
 }
 
 // Create product card HTML
@@ -92,15 +167,9 @@ function setupEventListeners() {
             filterBtns.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             currentFilter = this.getAttribute('data-filter');
-            displayedProducts = 8;
+            currentPage = 1;
             displayProducts();
         });
-    });
-    
-    // Load more button
-    loadMoreBtn.addEventListener('click', function() {
-        displayedProducts += 4;
-        displayProducts();
     });
     
     // Admin panel toggle
@@ -121,6 +190,9 @@ function setupEventListeners() {
         document.getElementById('importFile').click();
     });
     document.getElementById('importFile').addEventListener('change', importProducts);
+    
+    // Quick action buttons
+    setupQuickActions();
     
     // Affiliate link clicks
     document.addEventListener('click', function(e) {
@@ -148,6 +220,19 @@ function setupEventListeners() {
             showNotification(!isSaved ? 'Added to wishlist!' : 'Removed from wishlist');
         }
     });
+}
+
+// Setup quick actions for form
+function setupQuickActions() {
+    const quickActions = document.createElement('div');
+    quickActions.className = 'quick-actions';
+    quickActions.innerHTML = `
+        <button type="button" class="quick-btn" onclick="fillSampleData()">Fill Sample</button>
+        <button type="button" class="quick-btn" onclick="clearForm()">Clear Form</button>
+        <button type="button" class="quick-btn" onclick="addAnother()">Add Another</button>
+        <button type="button" class="quick-btn" onclick="addRandomProduct()">Random Product</button>
+    `;
+    productForm.appendChild(quickActions);
 }
 
 // Admin Panel Functions
@@ -192,9 +277,9 @@ function addProductFromForm() {
     displayProducts();
     updateProductList();
     
-    // Reset form
-    productForm.reset();
-    showNotification('Product added successfully!');
+    showSuccessMessage('Product added successfully!');
+    
+    // Don't clear form by default - allow multiple entries
 }
 
 // Update product list in admin panel
@@ -206,6 +291,7 @@ function updateProductList() {
             <div class="empty-state">
                 <i class="fas fa-box-open"></i>
                 <p>No products added yet</p>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem;">Use the form above to add your first product!</p>
             </div>
         `;
         return;
@@ -279,6 +365,67 @@ function importProducts(event) {
     event.target.value = '';
 }
 
+// Quick Action Functions
+function fillSampleData() {
+    document.getElementById('affiliateLink').value = 'https://www.tiktok.com/affiliate/your-link-here';
+    document.getElementById('productTitle').value = 'Amazing TikTok Product';
+    document.getElementById('productDescription').value = 'This product is going viral on TikTok for its incredible results!';
+    document.getElementById('productPrice').value = '$29.99';
+    document.getElementById('productOriginalPrice').value = '$49.99';
+    document.getElementById('productCategory').value = 'beauty';
+    document.getElementById('productBadge').value = 'Viral';
+}
+
+function clearForm() {
+    productForm.reset();
+    showNotification('Form cleared!');
+}
+
+function addAnother() {
+    if (productForm.checkValidity()) {
+        addProductFromForm();
+        productForm.reset();
+    } else {
+        productForm.reportValidity();
+    }
+}
+
+function addRandomProduct() {
+    const categories = ['beauty', 'tech', 'home', 'fashion'];
+    const badges = ['Viral', 'Trending', 'Bestseller', 'New', 'Hot', ''];
+    
+    document.getElementById('affiliateLink').value = `https://www.tiktok.com/affiliate/product-${Date.now()}`;
+    document.getElementById('productTitle').value = `Awesome ${categories[Math.floor(Math.random() * categories.length)]} Product`;
+    document.getElementById('productDescription').value = 'This amazing product is taking TikTok by storm with incredible results that everyone is talking about!';
+    document.getElementById('productPrice').value = `$${(Math.random() * 50 + 10).toFixed(2)}`;
+    document.getElementById('productOriginalPrice').value = `$${(Math.random() * 100 + 30).toFixed(2)}`;
+    document.getElementById('productCategory').value = categories[Math.floor(Math.random() * categories.length)];
+    document.getElementById('productBadge').value = badges[Math.floor(Math.random() * badges.length)];
+    
+    showNotification('Random product data filled!');
+}
+
+// Success message
+function showSuccessMessage(message) {
+    // Remove existing success message
+    const existingMessage = document.querySelector('.success-message');
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+    
+    const successMsg = document.createElement('div');
+    successMsg.className = 'success-message';
+    successMsg.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+    
+    // Insert after the form
+    productForm.parentNode.insertBefore(successMsg, productForm.nextSibling);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        successMsg.remove();
+    }, 3000);
+}
+
 // Simple notification system
 function showNotification(message) {
     const notification = document.createElement('div');
@@ -306,8 +453,15 @@ function showNotification(message) {
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideIn {
-        from { transform: translateX(100%); }
-        to { transform: translateX(0); }
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .no-products {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 3rem;
+        color: #666;
     }
 `;
 document.head.appendChild(style);
