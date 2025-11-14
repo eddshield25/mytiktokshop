@@ -1,25 +1,5 @@
 // Dynamic Product Management System
-let affiliateProducts = JSON.parse(localStorage.getItem('tiktrendProducts')) || [
-    // Sample products
-    {
-        affiliateLink: "https://www.tiktok.com/affiliate/sample1",
-        title: "Viral Hair Growth Serum",
-        description: "The hair serum that's taking TikTok by storm! Users report incredible growth results in weeks.",
-        price: "$24.99",
-        originalPrice: "$39.99",
-        category: "beauty",
-        badge: "Viral"
-    },
-    {
-        affiliateLink: "https://www.tiktok.com/affiliate/sample2",
-        title: "Smart Posture Corrector",
-        description: "Wearable device that vibrates when you slouch. Perfect for desk workers and students.",
-        price: "$29.99",
-        originalPrice: "$49.99",
-        category: "tech",
-        badge: "Trending"
-    }
-];
+let affiliateProducts = JSON.parse(localStorage.getItem('tiktrendProducts')) || [];
 
 // Display Configuration
 const PRODUCTS_PER_PAGE = 20; // 4 products per row × 5 rows
@@ -29,12 +9,13 @@ let currentFilter = 'all';
 // DOM Elements
 const productsGrid = document.getElementById('productsGrid');
 const filterBtns = document.querySelectorAll('.filter-btn');
-const loadMoreBtn = document.getElementById('loadMore');
 const adminPanel = document.getElementById('adminPanel');
 const adminToggle = document.getElementById('adminToggle');
 const productForm = document.getElementById('productForm');
 const productList = document.getElementById('productList');
 const productCount = document.getElementById('productCount');
+const searchBtn = document.getElementById('searchBtn');
+const cartBtn = document.getElementById('cartBtn');
 const paginationContainer = document.createElement('div');
 
 // Initialize the website
@@ -49,7 +30,8 @@ document.addEventListener('DOMContentLoaded', function() {
 // Initialize Pagination
 function initializePagination() {
     paginationContainer.className = 'pagination';
-    productsGrid.parentNode.insertBefore(paginationContainer, productsGrid.nextSibling);
+    const productsSection = document.querySelector('.products-section .container');
+    productsSection.appendChild(paginationContainer);
 }
 
 // Display products with pagination
@@ -102,23 +84,13 @@ function updatePagination(totalProducts, totalPages) {
     prevButton.className = 'pagination-btn';
     prevButton.innerHTML = '<i class="fas fa-chevron-left"></i> Previous';
     prevButton.disabled = currentPage === 1;
-    prevButton.addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage--;
-            displayProducts();
-        }
-    });
+    prevButton.addEventListener('click', goToPreviousPage);
     
     const nextButton = document.createElement('button');
     nextButton.className = 'pagination-btn';
     nextButton.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
     nextButton.disabled = currentPage === totalPages;
-    nextButton.addEventListener('click', () => {
-        if (currentPage < totalPages) {
-            currentPage++;
-            displayProducts();
-        }
-    });
+    nextButton.addEventListener('click', goToNextPage);
     
     const pageInfo = document.createElement('span');
     pageInfo.className = 'page-info';
@@ -127,6 +99,28 @@ function updatePagination(totalProducts, totalPages) {
     paginationContainer.appendChild(prevButton);
     paginationContainer.appendChild(pageInfo);
     paginationContainer.appendChild(nextButton);
+}
+
+// Pagination functions
+function goToPreviousPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        displayProducts();
+        window.scrollTo({ top: productsGrid.offsetTop - 100, behavior: 'smooth' });
+    }
+}
+
+function goToNextPage() {
+    const filteredProducts = currentFilter === 'all' 
+        ? affiliateProducts 
+        : affiliateProducts.filter(product => product.category === currentFilter);
+    const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
+    
+    if (currentPage < totalPages) {
+        currentPage++;
+        displayProducts();
+        window.scrollTo({ top: productsGrid.offsetTop - 100, behavior: 'smooth' });
+    }
 }
 
 // Create product card HTML
@@ -172,6 +166,19 @@ function setupEventListeners() {
         });
     });
     
+    // Search button
+    searchBtn.addEventListener('click', function() {
+        const searchTerm = prompt('What product are you looking for?');
+        if (searchTerm) {
+            searchProducts(searchTerm);
+        }
+    });
+    
+    // Cart button
+    cartBtn.addEventListener('click', function() {
+        showNotification('Cart functionality would be implemented here!');
+    });
+    
     // Admin panel toggle
     adminToggle.addEventListener('click', openAdminPanel);
     
@@ -194,9 +201,11 @@ function setupEventListeners() {
     // Quick action buttons
     setupQuickActions();
     
-    // Affiliate link clicks
+    // Delegate events for dynamic content
     document.addEventListener('click', function(e) {
+        // Affiliate link clicks
         if (e.target.classList.contains('btn-buy') || e.target.closest('.btn-buy')) {
+            e.preventDefault();
             const button = e.target.classList.contains('btn-buy') ? e.target : e.target.closest('.btn-buy');
             const affiliateLink = button.getAttribute('data-link');
             
@@ -204,11 +213,10 @@ function setupEventListeners() {
             window.open(affiliateLink, '_blank');
             showNotification('Opening TikTok Shop...');
         }
-    });
-    
-    // Wishlist functionality
-    document.addEventListener('click', function(e) {
+        
+        // Wishlist functionality
         if (e.target.classList.contains('btn-save') || e.target.closest('.btn-save')) {
+            e.preventDefault();
             const button = e.target.classList.contains('btn-save') ? e.target : e.target.closest('.btn-save');
             const icon = button.querySelector('i');
             const isSaved = icon.classList.contains('fas');
@@ -219,6 +227,28 @@ function setupEventListeners() {
             
             showNotification(!isSaved ? 'Added to wishlist!' : 'Removed from wishlist');
         }
+        
+        // Quick action buttons
+        if (e.target.classList.contains('quick-btn') || e.target.closest('.quick-btn')) {
+            e.preventDefault();
+            const button = e.target.classList.contains('quick-btn') ? e.target : e.target.closest('.quick-btn');
+            const action = button.textContent.trim();
+            
+            switch(action) {
+                case 'Fill Sample':
+                    fillSampleData();
+                    break;
+                case 'Clear Form':
+                    clearForm();
+                    break;
+                case 'Add Another':
+                    addAnother();
+                    break;
+                case 'Random Product':
+                    addRandomProduct();
+                    break;
+            }
+        }
     });
 }
 
@@ -227,10 +257,10 @@ function setupQuickActions() {
     const quickActions = document.createElement('div');
     quickActions.className = 'quick-actions';
     quickActions.innerHTML = `
-        <button type="button" class="quick-btn" onclick="fillSampleData()">Fill Sample</button>
-        <button type="button" class="quick-btn" onclick="clearForm()">Clear Form</button>
-        <button type="button" class="quick-btn" onclick="addAnother()">Add Another</button>
-        <button type="button" class="quick-btn" onclick="addRandomProduct()">Random Product</button>
+        <button type="button" class="quick-btn">Fill Sample</button>
+        <button type="button" class="quick-btn">Clear Form</button>
+        <button type="button" class="quick-btn">Add Another</button>
+        <button type="button" class="quick-btn">Random Product</button>
     `;
     productForm.appendChild(quickActions);
 }
@@ -278,8 +308,6 @@ function addProductFromForm() {
     updateProductList();
     
     showSuccessMessage('Product added successfully!');
-    
-    // Don't clear form by default - allow multiple entries
 }
 
 // Update product list in admin panel
@@ -365,6 +393,46 @@ function importProducts(event) {
     event.target.value = '';
 }
 
+// Search products
+function searchProducts(term) {
+    const filtered = affiliateProducts.filter(product => 
+        product.title.toLowerCase().includes(term.toLowerCase()) ||
+        product.description.toLowerCase().includes(term.toLowerCase())
+    );
+    
+    currentFilter = 'all';
+    filterBtns.forEach(btn => btn.classList.remove('active'));
+    filterBtns[0].classList.add('active');
+    
+    // Create temporary display of search results
+    const tempProducts = [...filtered];
+    currentPage = 1;
+    
+    productsGrid.innerHTML = '';
+    
+    if (tempProducts.length === 0) {
+        productsGrid.innerHTML = `
+            <div class="no-products" style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
+                <h3>No products found for "${term}"</h3>
+                <p>Try searching for something else or browse all categories.</p>
+            </div>
+        `;
+        paginationContainer.style.display = 'none';
+        return;
+    }
+    
+    const totalPages = Math.ceil(tempProducts.length / PRODUCTS_PER_PAGE);
+    const productsToShow = tempProducts.slice(0, PRODUCTS_PER_PAGE);
+    
+    productsToShow.forEach(product => {
+        const productCard = createProductCard(product);
+        productsGrid.appendChild(productCard);
+    });
+    
+    updatePagination(tempProducts.length, totalPages);
+    showNotification(`Found ${filtered.length} products for "${term}"`);
+}
+
 // Quick Action Functions
 function fillSampleData() {
     document.getElementById('affiliateLink').value = 'https://www.tiktok.com/affiliate/your-link-here';
@@ -374,6 +442,7 @@ function fillSampleData() {
     document.getElementById('productOriginalPrice').value = '$49.99';
     document.getElementById('productCategory').value = 'beauty';
     document.getElementById('productBadge').value = 'Viral';
+    showNotification('Sample data filled!');
 }
 
 function clearForm() {
@@ -407,7 +476,6 @@ function addRandomProduct() {
 
 // Success message
 function showSuccessMessage(message) {
-    // Remove existing success message
     const existingMessage = document.querySelector('.success-message');
     if (existingMessage) {
         existingMessage.remove();
@@ -417,10 +485,8 @@ function showSuccessMessage(message) {
     successMsg.className = 'success-message';
     successMsg.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
     
-    // Insert after the form
     productForm.parentNode.insertBefore(successMsg, productForm.nextSibling);
     
-    // Auto remove after 3 seconds
     setTimeout(() => {
         successMsg.remove();
     }, 3000);
